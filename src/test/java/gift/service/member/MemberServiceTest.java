@@ -14,6 +14,9 @@ import gift.entity.member.Member;
 import gift.entity.member.value.Role;
 import gift.exception.custom.InvalidAuthExeption;
 import gift.exception.custom.MemberNotFoundException;
+import gift.external.kakao.KakaoTokenClient;
+import gift.external.kakao.KakaoUserInfo;
+import gift.external.kakao.KakaoUserInfo.KakaoAccount;
 import gift.fixture.MemberFixture;
 import gift.repository.member.MemberRepository;
 import gift.util.JwtUtil;
@@ -211,6 +214,60 @@ class MemberServiceTest {
         void deleteMemberAsUserThrows() {
             assertThatThrownBy(() -> service.deleteMember(1L, USER))
                     .isInstanceOf(InvalidAuthExeption.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("Kakao 로그인")
+    class KakaoLoginTests {
+
+        @Mock
+        KakaoTokenClient kakaoTokenClient;
+
+        MemberServiceImpl kakaoService;
+
+        @BeforeEach
+        void initKakaoService() {
+            kakaoService = new MemberServiceImpl(memberRepo, jwtUtil, kakaoTokenClient);
+        }
+
+        @Test
+        @DisplayName("kakaoLogin: 기존 회원 로그인 성공")
+        void kakaoLoginExistingMember() {
+            String code = "auth-code";
+            String accessToken = "access-token";
+            KakaoUserInfo userInfo = new KakaoUserInfo(12345L, new KakaoAccount("email"));
+            String email = "kakao_12345@noemail.kakao";
+            Member member = MemberFixture.newRegisteredMember(1L, email, sha256(email), USER);
+
+            given(kakaoTokenClient.getAccessToken(code)).willReturn(accessToken);
+            given(kakaoTokenClient.getUserInfo(accessToken)).willReturn(userInfo);
+            given(memberRepo.findByEmail_Email(email)).willReturn(Optional.of(member));
+            given(jwtUtil.generateToken(1L, USER)).willReturn("jwt-token");
+
+            AuthResponse res = kakaoService.kakaoLogin(code);
+
+            assertThat(res.token()).isEqualTo("jwt-token");
+        }
+
+        @Test
+        @DisplayName("kakaoLogin: 신규 회원 자동 가입 후 토큰 반환")
+        void kakaoLoginNewMember() {
+            String code = "auth-code";
+            String accessToken = "access-token";
+            KakaoUserInfo userInfo = new KakaoUserInfo(67890L, new KakaoAccount("email"));
+            String email = "kakao_67890@noemail.kakao";
+            Member newMember = MemberFixture.newRegisteredMember(2L, email, sha256(email), USER);
+
+            given(kakaoTokenClient.getAccessToken(code)).willReturn(accessToken);
+            given(kakaoTokenClient.getUserInfo(accessToken)).willReturn(userInfo);
+            given(memberRepo.findByEmail_Email(email)).willReturn(Optional.empty());
+            given(memberRepo.save(any())).willReturn(newMember);
+            given(jwtUtil.generateToken(2L, USER)).willReturn("jwt-token");
+
+            AuthResponse res = kakaoService.kakaoLogin(code);
+
+            assertThat(res.token()).isEqualTo("jwt-token");
         }
     }
 }
