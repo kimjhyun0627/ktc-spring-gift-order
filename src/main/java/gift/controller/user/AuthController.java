@@ -2,6 +2,7 @@ package gift.controller.user;
 
 import gift.dto.member.AuthRequest;
 import gift.dto.member.AuthResponse;
+import gift.dto.member.KakaoLoginRequest;
 import gift.service.member.MemberService;
 import gift.util.BasicAuthUtil;
 import jakarta.validation.Valid;
@@ -39,4 +40,12 @@ public class AuthController {
         AuthResponse authResponse = memberService.login(email, password);
         return ResponseEntity.ok(authResponse);
     }
+
+    @PostMapping("login/kakao")
+    public ResponseEntity<AuthResponse> kakaoLogin(
+            @RequestBody KakaoLoginRequest authorizationCode) {
+        AuthResponse response = memberService.kakaoLogin(authorizationCode.code());
+        return ResponseEntity.ok(response);
+    }
+
 }

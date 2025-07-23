@@ -97,4 +97,42 @@ class AuthControllerTest {
                     .andExpect(status().isUnauthorized());
         }
     }
+
+    @Test
+    @DisplayName("POST /api/members/login/kakao - 카카오 로그인 성공 (200)")
+    void kakaoLoginSuccess() throws Exception {
+        String code = "auth-code";
+        AuthResponse resp = new AuthResponse("kakao-jwt-token");
+
+        Mockito.when(memberService.kakaoLogin(code)).thenReturn(resp);
+
+        mockMvc.perform(post("/api/members/login/kakao")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                    {
+                                        "code": "auth-code"
+                                    }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").value("kakao-jwt-token"));
+    }
+
+    @Test
+    @DisplayName("POST /api/members/login/kakao - 실패 시 401")
+    void kakaoLoginFailure() throws Exception {
+        String code = "bad-code";
+
+        Mockito.when(memberService.kakaoLogin(code))
+                .thenThrow(
+                        new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid Kakao Code"));
+
+        mockMvc.perform(post("/api/members/login/kakao")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                    {
+                                        "code": "bad-code"
+                                    }
+                                """))
+                .andExpect(status().isUnauthorized());
+    }
 }
