@@ -3,6 +3,7 @@ package gift.repository.member;
 import static gift.util.HashUtil.sha256;
 
 import gift.entity.member.Member;
+import gift.entity.member.value.MemberEmail;
 import gift.entity.member.value.Role;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -49,7 +50,7 @@ public class AdminAccountInitializer {
         MDC.put("email", email);
         MDC.put("role", roleName);
         try {
-            Optional<Member> existing = memberRepository.findByEmail_Email(email);
+            Optional<Member> existing = memberRepository.findByEmail(new MemberEmail(email));
             if (existing.isEmpty()) {
                 Member account = Member.of(
                         null,

@@ -22,4 +22,6 @@ public interface MemberService {
     Member updateMember(Long id, String email, String rawPassword, Role newRole, Role role);
 
     void deleteMember(Long id, Role role);
+
+    AuthResponse kakaoLogin(String authorizationCode);
 }

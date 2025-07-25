@@ -3,6 +3,7 @@ package gift.entity.member;
 import gift.entity.member.value.MemberEmail;
 import gift.entity.member.value.MemberId;
 import gift.entity.member.value.MemberPasswordHash;
+import gift.entity.member.value.ProviderType;
 import gift.entity.member.value.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -37,6 +38,14 @@ public class Member {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "provider_type", nullable = false)
+    private ProviderType providerType;
+
+    @Column(name = "oauth_id")
+    private String oauthId; // nullable
+
+
     protected Member() {
 
     }
@@ -46,13 +55,18 @@ public class Member {
             MemberEmail email,
             MemberPasswordHash passwordHash,
             Role role,
+            ProviderType providerType,
+            String oauthId,
             LocalDateTime createdAt) {
         this.id = id;
         this.email = email;
         this.passwordHash = passwordHash;
         this.role = role;
+        this.providerType = providerType;
+        this.oauthId = oauthId;
         this.createdAt = createdAt;
     }
+
 
     public static Member register(String email, String rawPasswordHash) {
         return new Member(
@@ -60,9 +74,28 @@ public class Member {
                 new MemberEmail(email),
                 new MemberPasswordHash(rawPasswordHash),
                 Role.USER,
+                ProviderType.NONE,
+                null,
                 LocalDateTime.now()
         );
     }
+
+    public static Member registerOauth(
+            String oauthId,
+            ProviderType providerType,
+            String email
+    ) {
+        return new Member(
+                null,
+                new MemberEmail(email),
+                null,
+                Role.USER,
+                providerType,
+                oauthId,
+                LocalDateTime.now()
+        );
+    }
+
 
     public static Member of(
             Long id,
@@ -75,6 +108,8 @@ public class Member {
                 new MemberEmail(email),
                 new MemberPasswordHash(passwordHash),
                 Role.of(roleInput),
+                ProviderType.NONE,
+                null,
                 createdAt
         );
     }
@@ -85,6 +120,8 @@ public class Member {
                 this.email,
                 this.passwordHash,
                 this.role,
+                this.providerType,
+                this.oauthId,
                 this.createdAt
         );
     }
@@ -95,6 +132,8 @@ public class Member {
                 new MemberEmail(newEmail),
                 this.passwordHash,
                 this.role,
+                this.providerType,
+                this.oauthId,
                 this.createdAt
         );
     }
@@ -105,6 +144,8 @@ public class Member {
                 this.email,
                 new MemberPasswordHash(newPasswordHash),
                 this.role,
+                this.providerType,
+                this.oauthId,
                 this.createdAt
         );
     }
@@ -115,6 +156,8 @@ public class Member {
                 this.email,
                 this.passwordHash,
                 newRole,
+                this.providerType,
+                this.oauthId,
                 this.createdAt
         );
     }
@@ -149,5 +192,13 @@ public class Member {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public ProviderType getProviderType() {
+        return providerType;
+    }
+
+    public String getOauthId() {
+        return oauthId;
     }
 }
