@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import gift.entity.member.Member;
+import gift.entity.member.value.MemberEmail;
 import gift.exception.custom.InvalidMemberException;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -40,7 +41,7 @@ class MemberRepositoryTest {
         Member member = Member.register(VALID_EMAIL, VALID_PASSWORD_HASH);
         memberRepository.saveAndFlush(member);
 
-        Optional<Member> found = memberRepository.findByEmail_Email(VALID_EMAIL);
+        Optional<Member> found = memberRepository.findByEmail(new MemberEmail(VALID_EMAIL));
         assertThat(found).isPresent();
         assertThat(found.get().getEmail().email()).isEqualTo(VALID_EMAIL);
     }
@@ -48,7 +49,7 @@ class MemberRepositoryTest {
     @Test
     @DisplayName("이메일 조회 실패 - 결과 없음")
     void findByEmail_notFound() {
-        Optional<Member> found = memberRepository.findByEmail_Email("none@example.com");
+        Optional<Member> found = memberRepository.findByEmail(new MemberEmail("none@example.com"));
         assertThat(found).isEmpty();
     }
 

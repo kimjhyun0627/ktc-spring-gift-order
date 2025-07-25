@@ -13,6 +13,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 @Component
@@ -46,16 +47,14 @@ public class KakaoTokenClient {
                     tokenUrl, request, KakaoTokenResponse.class
             );
 
-            if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
-                throw new InvalidAuthExeption("카카오로부터 토큰을 받을 수 없습니다.");
+            KakaoTokenResponse token = response.getBody();
+
+            if (!response.getStatusCode().is2xxSuccessful() || token == null
+                    || token.accessToken() == null || token.accessToken().isBlank()) {
+                throw new InvalidAuthExeption("카카오로부터 유효한 액세스 토큰을 받지 못했습니다.");
             }
 
-            String accessToken = response.getBody().accessToken();
-            if (accessToken == null || accessToken.isBlank()) {
-                throw new InvalidAuthExeption("카카오 액세스 토큰이 비어 있습니다.");
-            }
-
-            return response.getBody().accessToken();
+            return token.accessToken();
         } catch (HttpClientErrorException | HttpServerErrorException ex) {
             String body = ex.getResponseBodyAsString();
             throw new InvalidAuthExeption("카카오 토큰 요청 실패: " + body);
@@ -66,10 +65,12 @@ public class KakaoTokenClient {
 
     public KakaoUserInfo getUserInfo(String accessToken) {
         try {
+            HttpEntity<Void> request = new HttpEntity<>(createHeaders(accessToken));
+
             ResponseEntity<KakaoUserInfo> response = restTemplate.exchange(
                     userInfoUrl,
                     HttpMethod.GET,
-                    new HttpEntity<>(createHeaders(accessToken)),
+                    request,
                     KakaoUserInfo.class
             );
 
@@ -80,14 +81,13 @@ public class KakaoTokenClient {
 
             return body;
 
-        } catch (HttpClientErrorException | HttpServerErrorException ex) {
-            String body = ex.getResponseBodyAsString();
-            throw new InvalidAuthExeption("카카오 사용자 정보 요청 실패: " + body);
+        } catch (RestClientResponseException ex) {
+            throw new InvalidAuthExeption("카카오 사용자 정보 요청 실패: " + ex.getResponseBodyAsString());
         } catch (Exception e) {
             throw new InvalidAuthExeption("카카오 사용자 정보 요청 중 오류 발생");
         }
     }
-
+    
     private HttpHeaders createHeaders(String accessToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);

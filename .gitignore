@@ -6,7 +6,7 @@ build/
 !**/src/test/**/build/
 
 # 민감정보 분리
-**/application.properties
+**/application-secrets.properties
 
 ### STS ###
 .apt_generated

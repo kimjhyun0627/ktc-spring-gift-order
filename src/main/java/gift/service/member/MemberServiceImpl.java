@@ -5,6 +5,8 @@ import static gift.util.HashUtil.sha256;
 import gift.dto.member.AuthRequest;
 import gift.dto.member.AuthResponse;
 import gift.entity.member.Member;
+import gift.entity.member.value.MemberEmail;
+import gift.entity.member.value.ProviderType;
 import gift.entity.member.value.Role;
 import gift.exception.custom.InvalidAuthExeption;
 import gift.exception.custom.MemberAlreadyExistsException;
@@ -52,7 +54,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public AuthResponse login(String email, String rawPassword) {
-        Member member = memberRepository.findByEmail_Email(email)
+        Member member = memberRepository.findByEmail(new MemberEmail(email))
                 .orElseThrow(() -> new MemberNotFoundException(email));
         if (!member.getPassword().passwordHash().equals(sha256(rawPassword))) {
             throw new MemberNotFoundException(email);
@@ -117,17 +119,16 @@ public class MemberServiceImpl implements MemberService {
         userInfo = kakaoTokenClient.getUserInfo(accessToken);
 
         String kakaoId = String.valueOf(userInfo.id());
-        String email = "kakao_" + kakaoId + "@noemail.kakao";
+        String email = "kakao_user_" + kakaoId + "@oauth.local"; // or @fake.email
 
-        Member member = memberRepository.findByEmail_Email(email)
+        Member member = memberRepository.findByOauthIdAndProviderType(kakaoId, ProviderType.KAKAO)
                 .orElseGet(() -> {
-                    Member newMember = Member.register(email, sha256(email));
+                    Member newMember = Member.registerOauth(kakaoId, ProviderType.KAKAO, email);
                     return memberRepository.save(newMember);
                 });
 
         String jwt = jwtUtil.generateToken(member.getId().id(), member.getRole());
         return new AuthResponse(jwt);
-
     }
 
     private void checkAdmin(Role role) {

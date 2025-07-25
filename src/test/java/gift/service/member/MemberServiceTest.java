@@ -11,6 +11,8 @@ import static org.mockito.BDDMockito.then;
 import gift.dto.member.AuthRequest;
 import gift.dto.member.AuthResponse;
 import gift.entity.member.Member;
+import gift.entity.member.value.MemberEmail;
+import gift.entity.member.value.ProviderType;
 import gift.entity.member.value.Role;
 import gift.exception.custom.InvalidAuthExeption;
 import gift.exception.custom.MemberNotFoundException;
@@ -84,7 +86,8 @@ class MemberServiceTest {
         @Test
         @DisplayName("login: 존재하지 않는 이메일 예외")
         void loginEmailNotFound() {
-            given(memberRepo.findByEmail_Email("user@test.com")).willReturn(Optional.empty());
+            given(memberRepo.findByEmail(new MemberEmail("user@test.com"))).willReturn(
+                    Optional.empty());
 
             assertThatThrownBy(() -> service.login("user@test.com", "passwordHash"))
                     .isInstanceOf(MemberNotFoundException.class)
@@ -100,7 +103,8 @@ class MemberServiceTest {
                     sha256("wrong"),
                     Role.USER
             );
-            given(memberRepo.findByEmail_Email("user@test.com")).willReturn(Optional.of(wrong));
+            given(memberRepo.findByEmail(new MemberEmail("user@test.com"))).willReturn(
+                    Optional.of(wrong));
 
             assertThatThrownBy(() -> service.login("user@test.com", "passwordHash"))
                     .isInstanceOf(MemberNotFoundException.class)
@@ -110,7 +114,8 @@ class MemberServiceTest {
         @Test
         @DisplayName("login: 정상 로그인 시 토큰 반환")
         void loginSuccess() {
-            given(memberRepo.findByEmail_Email("user@test.com")).willReturn(Optional.of(existing));
+            given(memberRepo.findByEmail(new MemberEmail("user@test.com"))).willReturn(
+                    Optional.of(existing));
             given(jwtUtil.generateToken(1L, USER)).willReturn("token123");
 
             AuthResponse res = service.login("user@test.com", "passwordHash");
@@ -236,13 +241,20 @@ class MemberServiceTest {
         void kakaoLoginExistingMember() {
             String code = "auth-code";
             String accessToken = "access-token";
-            KakaoUserInfo userInfo = new KakaoUserInfo(12345L, new KakaoAccount("email"));
-            String email = "kakao_12345@noemail.kakao";
-            Member member = MemberFixture.newRegisteredMember(1L, email, sha256(email), USER);
+            Long kakaoUserId = 12345L;
+            String oauthId = String.valueOf(kakaoUserId);
+            ProviderType provider = ProviderType.KAKAO;
+            String email = "kakao_user_" + oauthId + "@oauth.local";
+
+            KakaoUserInfo userInfo = new KakaoUserInfo(kakaoUserId,
+                    new KakaoAccount("unused@email.com"));
+            Member member = MemberFixture.newRegisteredMember(1L, email, "dummy", USER)
+                    .withRole(USER);
 
             given(kakaoTokenClient.getAccessToken(code)).willReturn(accessToken);
             given(kakaoTokenClient.getUserInfo(accessToken)).willReturn(userInfo);
-            given(memberRepo.findByEmail_Email(email)).willReturn(Optional.of(member));
+            given(memberRepo.findByOauthIdAndProviderType(oauthId, provider)).willReturn(
+                    Optional.of(member));
             given(jwtUtil.generateToken(1L, USER)).willReturn("jwt-token");
 
             AuthResponse res = kakaoService.kakaoLogin(code);
@@ -250,18 +262,25 @@ class MemberServiceTest {
             assertThat(res.token()).isEqualTo("jwt-token");
         }
 
+
         @Test
         @DisplayName("kakaoLogin: 신규 회원 자동 가입 후 토큰 반환")
         void kakaoLoginNewMember() {
             String code = "auth-code";
             String accessToken = "access-token";
-            KakaoUserInfo userInfo = new KakaoUserInfo(67890L, new KakaoAccount("email"));
-            String email = "kakao_67890@noemail.kakao";
-            Member newMember = MemberFixture.newRegisteredMember(2L, email, sha256(email), USER);
+            Long kakaoUserId = 67890L;
+            String oauthId = String.valueOf(kakaoUserId);
+            ProviderType provider = ProviderType.KAKAO;
+            String email = "kakao_user_" + oauthId + "@oauth.local";
+
+            KakaoUserInfo userInfo = new KakaoUserInfo(kakaoUserId, new KakaoAccount("email"));
+
+            Member newMember = Member.registerOauth(oauthId, provider, email).withId(2L);
 
             given(kakaoTokenClient.getAccessToken(code)).willReturn(accessToken);
             given(kakaoTokenClient.getUserInfo(accessToken)).willReturn(userInfo);
-            given(memberRepo.findByEmail_Email(email)).willReturn(Optional.empty());
+            given(memberRepo.findByOauthIdAndProviderType(oauthId, provider)).willReturn(
+                    Optional.empty());
             given(memberRepo.save(any())).willReturn(newMember);
             given(jwtUtil.generateToken(2L, USER)).willReturn("jwt-token");
 
@@ -269,5 +288,6 @@ class MemberServiceTest {
 
             assertThat(res.token()).isEqualTo("jwt-token");
         }
+
     }
 }

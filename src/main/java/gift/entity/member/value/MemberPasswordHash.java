@@ -7,7 +7,7 @@ import java.util.Objects;
 
 @Embeddable
 public record MemberPasswordHash(
-        @Column(name = "password_hash", nullable = false)
+        @Column(name = "password_hash")
         String passwordHash
 ) {
 
