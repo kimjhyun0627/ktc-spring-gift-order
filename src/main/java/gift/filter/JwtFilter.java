@@ -59,7 +59,6 @@ public abstract class JwtFilter extends OncePerRequestFilter {
             }
 
             httpServletRequest.setAttribute("memberId", memberId);
-//            httpServletRequest.setAttribute("memberId", claims.get("memberId"));
             httpServletRequest.setAttribute("kakaoAccessToken", claims.get("kakaoAccessToken"));
 
             filterChain.doFilter(httpServletRequest, httpServletResponse);

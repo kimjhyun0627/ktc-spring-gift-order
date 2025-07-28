@@ -1,6 +1,7 @@
 package gift.repository.product.option;
 
 import gift.entity.product.option.ProductOption;
+import gift.entity.product.option.value.OptionName;
 import gift.entity.product.value.ProductId;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +12,6 @@ public interface ProductOptionRepository extends JpaRepository<ProductOption, Lo
 
     List<ProductOption> findAllByProduct_Id(ProductId id);
 
-    boolean existsByProduct_IdAndName_Name(ProductId productId, String name);
+    boolean existsByProduct_IdAndName(ProductId productId, OptionName name);
 }
 

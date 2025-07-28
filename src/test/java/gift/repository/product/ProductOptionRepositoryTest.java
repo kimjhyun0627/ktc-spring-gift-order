@@ -77,7 +77,7 @@ class ProductOptionRepositoryTest {
 
         // when
         boolean exists = optionRepository
-                .existsByProduct_IdAndName_Name(new ProductId(3L), "UniqueOpt");
+                .existsByProduct_IdAndName(new ProductId(3L), new OptionName("UniqueOpt"));
 
         // then
         assertThat(exists).isTrue();
@@ -96,7 +96,7 @@ class ProductOptionRepositoryTest {
 
         // when
         boolean exists = optionRepository
-                .existsByProduct_IdAndName_Name(new ProductId(4L), "OptY");
+                .existsByProduct_IdAndName(new ProductId(4L), new OptionName("OptY"));
 
         // then
         assertThat(exists).isFalse();
@@ -117,7 +117,7 @@ class ProductOptionRepositoryTest {
 
         // when
         boolean existsForP2 = optionRepository
-                .existsByProduct_IdAndName_Name(new ProductId(6L), "SharedOpt");
+                .existsByProduct_IdAndName(new ProductId(6L), new OptionName("SharedOpt"));
 
         // then
         assertThat(existsForP2).isFalse();
