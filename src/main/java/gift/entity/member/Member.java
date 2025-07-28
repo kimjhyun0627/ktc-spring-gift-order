@@ -45,6 +45,8 @@ public class Member {
     @Column(name = "oauth_id")
     private String oauthId; // nullable
 
+    @Column(name = "access_token")
+    private String accessToken;
 
     protected Member() {
 
@@ -66,7 +68,6 @@ public class Member {
         this.oauthId = oauthId;
         this.createdAt = createdAt;
     }
-
 
     public static Member register(String email, String rawPasswordHash) {
         return new Member(
@@ -96,7 +97,6 @@ public class Member {
         );
     }
 
-
     public static Member of(
             Long id,
             String email,
@@ -112,6 +112,10 @@ public class Member {
                 null,
                 createdAt
         );
+    }
+
+    public void updateAccessToken(String token) {
+        this.accessToken = token;
     }
 
     public Member withId(Long newId) {
@@ -200,5 +204,9 @@ public class Member {
 
     public String getOauthId() {
         return oauthId;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
     }
 }

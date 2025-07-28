@@ -27,7 +27,7 @@ class ProductOptionRepositoryTest {
     @DisplayName("findAllByProduct_Id: 저장된 옵션 모두 조회")
     void findAllByProductId_returnsAllOptions() {
         // given
-        Product product = Product.of(1L, "TestProduct", 1000, "http://img.png", false);
+        Product product = Product.of(99L, "TestProduct", 1000, "http://img.png", false);
         productRepository.saveAndFlush(product);
 
         ProductOption o1 = ProductOption.of("OptA", 5);
@@ -39,7 +39,7 @@ class ProductOptionRepositoryTest {
 
         // when
         List<ProductOption> options = optionRepository
-                .findAllByProduct_Id(new ProductId(1L));
+                .findAllByProduct_Id(new ProductId(99L));
 
         // then
         assertThat(options)
@@ -53,12 +53,12 @@ class ProductOptionRepositoryTest {
     @DisplayName("findAllByProduct_Id: 옵션이 없으면 빈 리스트 반환")
     void findAllByProductId_noOptions_returnsEmpty() {
         // given: 상품만 저장, 옵션은 없음
-        Product product = Product.of(2L, "EmptyProduct", 500, "http://img2.png", false);
+        Product product = Product.of(999L, "EmptyProduct", 500, "http://img2.png", false);
         productRepository.saveAndFlush(product);
 
         // when
         List<ProductOption> options = optionRepository
-                .findAllByProduct_Id(new ProductId(2L));
+                .findAllByProduct_Id(new ProductId(999L));
 
         // then
         assertThat(options).isEmpty();
