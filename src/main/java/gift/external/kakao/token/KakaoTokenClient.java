@@ -1,8 +1,8 @@
-package gift.external.kakao;
+package gift.external.kakao.token;
 
 import gift.config.KakaoConfig;
 import gift.exception.custom.InvalidAuthExeption;
-import gift.external.kakao.dto.KakaoTokenResponse;
+import gift.external.kakao.token.dto.KakaoTokenResponse;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -87,7 +87,7 @@ public class KakaoTokenClient {
             throw new InvalidAuthExeption("카카오 사용자 정보 요청 중 오류 발생");
         }
     }
-    
+
     private HttpHeaders createHeaders(String accessToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);

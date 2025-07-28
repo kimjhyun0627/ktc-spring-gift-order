@@ -2,15 +2,16 @@ package gift.controller.user;
 
 import gift.dto.member.AuthRequest;
 import gift.dto.member.AuthResponse;
-import gift.dto.member.KakaoLoginRequest;
 import gift.service.member.MemberService;
 import gift.util.BasicAuthUtil;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -41,11 +42,10 @@ public class AuthController {
         return ResponseEntity.ok(authResponse);
     }
 
-    @PostMapping("login/kakao")
-    public ResponseEntity<AuthResponse> kakaoLogin(
-            @RequestBody KakaoLoginRequest authorizationCode) {
-        AuthResponse response = memberService.kakaoLogin(authorizationCode.code());
+    @GetMapping("/login/kakao")
+    public ResponseEntity<AuthResponse> kakaoLogin(@RequestParam("code") String code) {
+        System.out.println("💬 Received kakao code: " + code);
+        AuthResponse response = memberService.kakaoLogin(code);
         return ResponseEntity.ok(response);
     }
-
 }

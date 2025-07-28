@@ -1,4 +1,4 @@
-package gift.external.kakao;
+package gift.external.kakao.token;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
