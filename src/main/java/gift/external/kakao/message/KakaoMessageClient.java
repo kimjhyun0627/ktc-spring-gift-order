@@ -25,20 +25,24 @@ public class KakaoMessageClient {
     }
 
     public void sendToMe(String accessToken, Order order, Member member) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(accessToken);
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("template_object", generateSelfMessage(order, member)); // 💡 JSON string
+            MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+            body.add("template_object", generateSelfMessage(order, member));
 
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 
-        restTemplate.postForEntity(
-                "https://kapi.kakao.com/v2/api/talk/memo/default/send",
-                request,
-                String.class
-        );
+            restTemplate.postForEntity(
+                    "https://kapi.kakao.com/v2/api/talk/memo/default/send",
+                    request,
+                    String.class
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("카카오 메시지 전송 실패", e);  // 💡 예외 래핑 추가
+        }
     }
 
     private String generateSelfMessage(Order order, Member member) {

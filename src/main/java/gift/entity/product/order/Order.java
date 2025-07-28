@@ -3,6 +3,7 @@ package gift.entity.product.order;
 import gift.entity.product.option.ProductOption;
 import gift.entity.product.order.value.OrderMessage;
 import gift.entity.product.order.value.OrderQuantity;
+import gift.exception.custom.InvalidOptionException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -40,6 +41,9 @@ public class Order {
     }
 
     private Order(ProductOption option, int quantity, String message) {
+        if (option == null) {
+            throw new InvalidOptionException("option은 null일 수 없습니다");
+        }
         this.option = option;
         this.quantity = new OrderQuantity(quantity);
         this.message = new OrderMessage(message);
