@@ -32,12 +32,14 @@ public class JwtUtil {
         long now = System.currentTimeMillis();
         return Jwts.builder()
                 .subject(memberId.toString())
+                .claim("memberId", memberId)
                 .claim("role", role.name())
                 .issuedAt(new Date(now))
                 .expiration(new Date(now + validityMillis))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
+
 
     public Jws<Claims> parseToken(String token) {
         return Jwts.parser()
