@@ -44,7 +44,6 @@ public class AuthController {
 
     @GetMapping("/login/kakao")
     public ResponseEntity<AuthResponse> kakaoLogin(@RequestParam("code") String code) {
-        System.out.println("💬 Received kakao code: " + code);
         AuthResponse response = memberService.kakaoLogin(code);
         return ResponseEntity.ok(response);
     }

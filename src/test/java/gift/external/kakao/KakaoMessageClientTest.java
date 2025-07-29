@@ -1,9 +1,8 @@
 package gift.external.kakao;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,8 +31,10 @@ import org.springframework.web.client.RestTemplate;
 class KakaoMessageClientTest {
 
     private final String url = "https://kapi.kakao.com/v2/api/talk/memo/default/send";
+
     @Mock
     RestTemplate restTemplate;
+
     @InjectMocks
     KakaoMessageClient kakaoMessageClient;
 
@@ -44,8 +45,8 @@ class KakaoMessageClientTest {
     }
 
     private Member dummyMember() {
-        Member member = MemberFixture.newRegisteredMember(1L, "user@example.com", "password",
-                Role.USER);
+        Member member = MemberFixture.newRegisteredMember(
+                1L, "user@example.com", "password", Role.USER);
         return member.withId(1L);
     }
 
@@ -55,49 +56,33 @@ class KakaoMessageClientTest {
         @Test
         @DisplayName("정상적으로 메시지를 전송한다")
         void success() {
-            // given
             when(restTemplate.postForEntity(eq(url), any(HttpEntity.class), eq(String.class)))
                     .thenReturn(ResponseEntity.ok("ok"));
 
-            // when
-            kakaoMessageClient.sendToMe("access-token", dummyOrder(), dummyMember());
+            kakaoMessageClient.sendToMe("access-token", "{\"dummy\":true}");
 
-            // then
             verify(restTemplate).postForEntity(eq(url), any(HttpEntity.class), eq(String.class));
         }
 
         @Test
         @DisplayName("401 Unauthorized 발생 시 RuntimeException 발생")
         void unauthorizedError() {
-            // given
             HttpClientErrorException ex = HttpClientErrorException.create(
-                    HttpStatus.UNAUTHORIZED, "Unauthorized", HttpHeaders.EMPTY,
-                    "{\"msg\":\"invalid token\"}".getBytes(), null
+                    HttpStatus.UNAUTHORIZED,
+                    "Unauthorized",
+                    HttpHeaders.EMPTY,
+                    "{\"msg\":\"invalid token\"}".getBytes(),
+                    null
             );
-
             when(restTemplate.postForEntity(eq(url), any(HttpEntity.class), eq(String.class)))
                     .thenThrow(ex);
 
-            // expect
             assertThatThrownBy(() ->
-                    kakaoMessageClient.sendToMe("invalid-token", dummyOrder(), dummyMember())
-            ).isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("카카오 메시지 전송 실패")
+                    kakaoMessageClient.sendToMe("invalid-token", "{}")
+            )
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("카카오 메세지 전송 실패")
                     .hasCauseInstanceOf(HttpClientErrorException.class);
-        }
-
-        @Test
-        @DisplayName("메시지 생성 실패 시 RuntimeException 발생")
-        void messageSerializationError() {
-            // given
-            Order order = mock(Order.class);
-            when(order.getOption()).thenThrow(new RuntimeException("옵션 조회 실패"));
-
-            // expect
-            assertThatThrownBy(() ->
-                    kakaoMessageClient.sendToMe("token", order, dummyMember())
-            ).isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("카카오 메시지 전송 실패");
         }
     }
 }
