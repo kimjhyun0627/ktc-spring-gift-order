@@ -46,12 +46,25 @@ public abstract class JwtFilter extends OncePerRequestFilter {
 
         try {
             Jws<Claims> jws = jwtUtil.parseToken(token);
-            httpServletRequest.setAttribute("authClaims", jws.getPayload());
+            Claims claims = jws.getPayload();
+
+            httpServletRequest.setAttribute("authClaims", claims);
+
+            Object rawId = claims.get("memberId");
+            Long memberId = null;
+            if (rawId instanceof Integer i) {
+                memberId = i.longValue();
+            } else {
+                throw new JwtException("memberId 클레임이 올바른 숫자 타입이 아닙니다: " + rawId);
+            }
+
+            httpServletRequest.setAttribute("memberId", memberId);
+            httpServletRequest.setAttribute("kakaoAccessToken", claims.get("kakaoAccessToken"));
+
+            filterChain.doFilter(httpServletRequest, httpServletResponse);
         } catch (JwtException ex) {
             writeError(httpServletResponse, "유효하지 않은 토큰입니다.");
-            return;
         }
 
-        filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
 }

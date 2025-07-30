@@ -1,16 +1,12 @@
 package gift.filter;
 
-import gift.util.BearerAuthUtil;
 import gift.util.JwtUtil;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class JwtHeaderFilter extends JwtFilter {
-
+    
     public JwtHeaderFilter(JwtUtil jwtUtil) {
         super(jwtUtil);
     }

@@ -9,7 +9,9 @@ import static org.mockito.Mockito.when;
 
 import gift.config.KakaoConfig;
 import gift.exception.custom.InvalidAuthExeption;
-import gift.external.kakao.dto.KakaoTokenResponse;
+import gift.external.kakao.token.KakaoTokenClient;
+import gift.external.kakao.token.KakaoUserInfo;
+import gift.external.kakao.token.dto.KakaoTokenResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

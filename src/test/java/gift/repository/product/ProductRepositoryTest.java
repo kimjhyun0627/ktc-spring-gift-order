@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import gift.entity.product.Product;
 import gift.entity.product.value.ProductId;
+import gift.entity.product.value.ProductName;
 import gift.exception.custom.InvalidProductException;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -41,7 +42,7 @@ class ProductRepositoryTest {
         Product product = Product.of(2L, "SearchName", 500, "http://example.com/img2.png", false);
         productRepository.saveAndFlush(product);
 
-        Optional<Product> found = productRepository.findByName_Name("SearchName");
+        Optional<Product> found = productRepository.findByName(new ProductName("SearchName"));
         assertThat(found).isPresent();
         assertThat(found.get().getId().id()).isEqualTo(2L);
     }
@@ -49,7 +50,7 @@ class ProductRepositoryTest {
     @Test
     @DisplayName("이름 조회 실패 - 결과 없음")
     void findByName_notFound() {
-        Optional<Product> found = productRepository.findByName_Name("NoSuchName");
+        Optional<Product> found = productRepository.findByName(new ProductName("NoSuchName"));
         assertThat(found).isEmpty();
     }
 

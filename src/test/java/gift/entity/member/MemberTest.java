@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import gift.entity.member.value.ProviderType;
 import gift.entity.member.value.Role;
 import gift.exception.custom.InvalidMemberException;
 import java.time.LocalDateTime;
@@ -104,5 +105,63 @@ class MemberTest {
         assertThrows(InvalidMemberException.class, () ->
                 Member.of(5L, "u@u.com", badHash, "USER", LocalDateTime.now())
         );
+    }
+
+    @Test
+    void registerOauth_setsProviderAndOauthId() {
+        String oauthId = "kakao_123";
+        String email = "oauth@kakao.com";
+
+        Member m = Member.registerOauth(oauthId, ProviderType.KAKAO, email);
+
+        assertNull(m.getId());
+        assertEquals(email, m.getEmail().email());
+        assertNull(m.getPassword(), "OAuth 회원은 password 없이 생성됨");
+        assertEquals(Role.USER, m.getRole());
+        assertEquals(ProviderType.KAKAO, m.getProviderType());
+        assertEquals(oauthId, m.getOauthId());
+        assertNotNull(m.getCreatedAt());
+    }
+
+    @Test
+    void updateAccessToken_setsAccessToken() {
+        Member m = Member.register("access@test.com",
+                "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789");
+        assertNull(m.getAccessToken());
+
+        String token = "new-access-token";
+        m.updateAccessToken(token);
+
+        assertEquals(token, m.getAccessToken());
+    }
+
+    @Test
+    void changeEmail_setsNewEmail() {
+        Member m = Member.register("old@x.com",
+                "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789");
+        m.changeEmail("new@x.com");
+
+        assertEquals("new@x.com", m.getEmail().email());
+    }
+
+    @Test
+    void changePasswordHash_setsNewPassword() {
+        Member m = Member.register("pw@test.com",
+                "oldhash1234567890abcdef1234567890abcdef1234567890abcdef1234567890");
+        String newHash = "newhash1234567890abcdef1234567890abcdef1234567890abcdef1234567890";
+
+        m.changePasswordHash(newHash);
+
+        assertEquals(newHash, m.getPassword().passwordHash());
+    }
+
+    @Test
+    void changeRole_setsNewRole() {
+        Member m = Member.register("role@test.com",
+                "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789");
+
+        m.changeRole(Role.ADMIN);
+
+        assertEquals(Role.ADMIN, m.getRole());
     }
 }

@@ -11,8 +11,8 @@ import gift.entity.member.value.Role;
 import gift.exception.custom.InvalidAuthExeption;
 import gift.exception.custom.MemberAlreadyExistsException;
 import gift.exception.custom.MemberNotFoundException;
-import gift.external.kakao.KakaoTokenClient;
-import gift.external.kakao.KakaoUserInfo;
+import gift.external.kakao.token.KakaoTokenClient;
+import gift.external.kakao.token.KakaoUserInfo;
 import gift.repository.member.MemberRepository;
 import gift.util.JwtUtil;
 import jakarta.transaction.Transactional;
@@ -126,6 +126,9 @@ public class MemberServiceImpl implements MemberService {
                     Member newMember = Member.registerOauth(kakaoId, ProviderType.KAKAO, email);
                     return memberRepository.save(newMember);
                 });
+
+        member.updateAccessToken(accessToken);
+        memberRepository.save(member);
 
         String jwt = jwtUtil.generateToken(member.getId().id(), member.getRole());
         return new AuthResponse(jwt);

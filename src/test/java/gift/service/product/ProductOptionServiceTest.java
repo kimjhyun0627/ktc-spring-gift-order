@@ -115,7 +115,7 @@ class ProductOptionServiceTest {
         then(productRepository).should().findById(eq(PRODUCT_ID_WRAPPER));
         then(optionRepository).should(times(1)).save(any(ProductOption.class));
         then(optionRepository).should(never())
-                .existsByProduct_IdAndName_Name(any(), any());
+                .existsByProduct_IdAndName(any(), any());
     }
 
 
@@ -135,7 +135,7 @@ class ProductOptionServiceTest {
         ).isInstanceOf(OptionAlreadyExistException.class);
 
         then(optionRepository).should().save(any(ProductOption.class));
-        then(optionRepository).should(never()).existsByProduct_IdAndName_Name(any(), any());
+        then(optionRepository).should(never()).existsByProduct_IdAndName(any(), any());
     }
 
 

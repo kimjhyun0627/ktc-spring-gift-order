@@ -2,21 +2,14 @@ INSERT INTO PRODUCT (NAME, PRICE, IMAGE_URL, HIDDEN)
 VALUES ('Sample1', 1000, 'http://example.com/1.png', FALSE),
        ('카카오가 들어간 항목', 1500, 'http://kakao.jpeg', TRUE),
        ('Sample2', 2000, 'http://example.com/2.png', FALSE),
-       ('Sample3', 3000, 'http://example.com/3.png', TRUE),
-       ('Sample4', 4000, 'http://example.com/4.png', FALSE),
-       ('Sample5', 5000, 'http://example.com/5.png', TRUE),
-       ('Sample6', 6000, 'http://example.com/6.png', FALSE),
-       ('Sample7', 7000, 'http://example.com/7.png', TRUE),
-       ('Sample8', 8000, 'http://example.com/8.png', FALSE),
-       ('Sample9', 9000, 'http://example.com/9.png', TRUE),
-       ('Sample10', 10000, 'http://example.com/10.png', FALSE),
-       ('Sample11', 11000, 'http://example.com/11.png', TRUE),
-       ('Sample12', 12000, 'http://example.com/12.png', FALSE),
-       ('Sample13', 13000, 'http://example.com/13.png', TRUE),
-       ('Sample14', 14000, 'http://example.com/14.png', FALSE),
-       ('Sample15', 15000, 'http://example.com/15.png', TRUE),
-       ('Sample16', 16000, 'http://example.com/16.png', FALSE),
-       ('Sample17', 17000, 'http://example.com/17.png', TRUE),
-       ('Sample18', 18000, 'http://example.com/18.png', FALSE),
-       ('Sample19', 19000, 'http://example.com/19.png', TRUE),
-       ('Sample20', 20000, 'http://example.com/20.png', FALSE);
+       ('Sample3', 3000, 'http://example.com/3.png', TRUE);
+
+INSERT INTO PRODUCT_OPTION (PRODUCT_ID, NAME, QUANTITY)
+VALUES (1, '색상 레드', 10),
+       (1, '색상 블루', 5),
+       (2, '맛 카카오', 20),
+       (2, '맛 바닐라', 1),
+       (3, '용량 100ml', 15),
+       (3, '용량 200ml', 8),
+       (4, '버전 스탠다드', 12),
+       (4, '버전 프리미엄', 6);

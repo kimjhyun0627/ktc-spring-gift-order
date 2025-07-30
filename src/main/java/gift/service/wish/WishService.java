@@ -14,6 +14,4 @@ public interface WishService {
     Wish changeWishAmount(Long id, Member member, Long productId, int amount);
 
     void removeWish(Long wishId, Member member);
-
-
 }
