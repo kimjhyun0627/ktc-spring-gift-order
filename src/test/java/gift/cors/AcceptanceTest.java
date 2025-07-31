@@ -26,7 +26,7 @@ class AcceptanceTest {
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "*"))
                 .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS,
-                        "GET,HEAD,POST,PUT,PATCH,DELETE"))
+                        "GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS"))
                 .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS,
                         HttpHeaders.LOCATION));
     }
