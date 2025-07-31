@@ -19,7 +19,7 @@ OLD_PID=$(pgrep -f "$JAR_NAME" || true)
 if [ -n "$OLD_PID" ]; then
   echo "Stopping old process ($OLD_PID)…"
   kill -15 $OLD_PID
-  sleep 2
+  sleep 10
 fi
 
 mkdir -p "$DEPLOY_DIR"

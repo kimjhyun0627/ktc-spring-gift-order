@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 public abstract class JwtFilter extends OncePerRequestFilter {
@@ -34,7 +35,7 @@ public abstract class JwtFilter extends OncePerRequestFilter {
             @NotNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        if ("OPTIONS".equalsIgnoreCase(httpServletRequest.getMethod())) {
+        if (HttpMethod.OPTIONS.name().equalsIgnoreCase(httpServletRequest.getMethod())) {
             filterChain.doFilter(httpServletRequest, httpServletResponse);
             return;
         }
