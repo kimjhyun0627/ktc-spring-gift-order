@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-APP_DIR=${1:-"$PWD/app"}
+APP_DIR=${1:-"$PWD"}
 DEPLOY_DIR=${2:-"$PWD/deploy"}
 
 echo ">>> APP_DIR = $APP_DIR"
