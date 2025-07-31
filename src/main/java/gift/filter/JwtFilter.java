@@ -33,6 +33,12 @@ public abstract class JwtFilter extends OncePerRequestFilter {
             @NotNull HttpServletResponse httpServletResponse,
             @NotNull FilterChain filterChain
     ) throws ServletException, IOException {
+
+        if ("OPTIONS".equalsIgnoreCase(httpServletRequest.getMethod())) {
+            filterChain.doFilter(httpServletRequest, httpServletResponse);
+            return;
+        }
+
         if (!shouldFilter(httpServletRequest)) {
             filterChain.doFilter(httpServletRequest, httpServletResponse);
             return;
@@ -65,6 +71,5 @@ public abstract class JwtFilter extends OncePerRequestFilter {
         } catch (JwtException ex) {
             writeError(httpServletResponse, "유효하지 않은 토큰입니다.");
         }
-
     }
 }
